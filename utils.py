@@ -56,37 +56,21 @@ def set_seed(seed):
 
 
 def metrics(trues, preds):
-    # 合并所有batch的结果
     trues = np.concatenate(trues, axis=0).flatten()  # [n_samples]
     preds = np.concatenate(preds, axis=0)  # [n_samples, n_classes]
+    pred_labels = preds.argmax(axis=-1)  
 
-    # 获取预测标签（必须是离散值0/1）
-    pred_labels = preds.argmax(axis=-1)  # 关键修改！取概率最大的类别作为预测标签
-
-    # 计算各项指标
     acc = accuracy_score(trues, pred_labels)
-    auc = roc_auc_score(trues, preds[:, 1])  # 假设是二分类任务，取正类概率
-    f1 = f1_score(trues, pred_labels, average='macro')  # 二分类需指定average
+    auc = roc_auc_score(trues, preds[:, 1])  
+    f1 = f1_score(trues, pred_labels, average='average')  
     mcc = matthews_corrcoef(trues, pred_labels)
-
     true_classes = np.hstack(trues)
-    # print("2",pred_classes)
-    # 统计preds中正样本和负样本的数量
-    TP = np.sum((true_classes == 1) & (pred_labels == 1))  # 真正例
-    FN = np.sum((true_classes == 1) & (pred_labels == 0))  # 假负例
-    FP = np.sum((true_classes == 0) & (pred_labels == 1))  # 假正例
-    TN = np.sum((true_classes == 0) & (pred_labels == 0))  # 真负例
-
-    # # 打印结果
-    # print("真实为正样本且预测为正样本的个数 (TP): ", TP)  # 真实为正样本且预测为正样本的个数
-    # print("真实为正样本但预测为负样本的个数 (FN): ", FN)  # 真实为正样本但预测为负样本的个数
-    # print("真实为负样本但预测为正样本的个数 (FP): ", FP)  # 真实为负样本但预测为正样本的个数
-    # print("真实为负样本且预测为负样本的个数 (TN): ", TN)  # 真实为负样本且预测为负样本的个数
-
-
+    TP = np.sum((true_classes == 1) & (pred_labels == 1)) 
+    FN = np.sum((true_classes == 1) & (pred_labels == 0))  
+    FP = np.sum((true_classes == 0) & (pred_labels == 1))  
+    TN = np.sum((true_classes == 0) & (pred_labels == 0))  
+    
     return acc, auc, f1, mcc
-
-    # return acc, auc
 
 def createPath(path):
     if os.path.exists(path):
